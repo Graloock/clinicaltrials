@@ -1,7 +1,8 @@
 declare global {
   interface Data {
-    nextPageToken: string;
     studies: Trial[];
+    nextPageToken: string;
+    query?: string;
   }
 
   interface Trial {

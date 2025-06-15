@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+:root {
+  --background: var(--color-blue-200);
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+@media (prefers-color-scheme: no-preference) {
+  :root {
+    --background: var(--color-blue-900);
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.btn {
+  @apply bg-blue-600 hover:bg-blue-800  active:bg-blue-950 text-white font-bold py-2 px-4 rounded-full duration-100;
+}
+
+.card {
+  @apply bg-blue-500 border-2 text-white border-blue-600 py-2 px-4 rounded-2xl shadow-lg;
+}
+
+.header {
+  @apply w-full bg-blue-600 text-white py-3 px-8 text-xl font-semibold shadow-md;
+}
+
+.search-btn {
+  @apply absolute right-1 top-1/2 -translate-y-1/2 size-6 text-sm bg-blue-600 rounded-2xl hover:bg-blue-800 active:bg-blue-950 duration-100
+}
