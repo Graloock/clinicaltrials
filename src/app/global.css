@@ -36,5 +36,9 @@ body {
 }
 
 .search-btn {
-  @apply absolute right-1 top-1/2 -translate-y-1/2 size-6 text-sm bg-blue-600 rounded-2xl hover:bg-blue-800 active:bg-blue-950 duration-100
+  @apply absolute right-1 top-1/2 -translate-y-1/2 size-6 text-sm bg-blue-600 rounded-2xl hover:bg-blue-800 active:bg-blue-950 duration-100;
+}
+
+.input {
+  @apply bg-white rounded-md shadow-md pl-2 pr-2 w-full ;
 }

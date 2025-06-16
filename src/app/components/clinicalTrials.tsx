@@ -50,7 +50,7 @@ export default function ClinicalTrials({ studies, nextPageToken, query}: Data) {
   return (
     <div
       key={nextPageToken}
-      className="grid md:grid-cols-2 xl:grid-cols-3 gap-4"
+      className="grid md:grid-cols-2 xl:grid-cols-3 gap-4 mt-14"
     >
       {trials.map(
         ({
@@ -64,7 +64,7 @@ export default function ClinicalTrials({ studies, nextPageToken, query}: Data) {
             <p className="text-lg">Conditions: {conditions.join(", ")}</p>
             <p>NCT Number: {nctId}</p>
             <div className="justify-self-center bottom">
-              <button className="btn">Apply To Trial</button>
+              <button className="btn" value={nctId}>Apply To Trial</button>
             </div>
           </div>
         ),

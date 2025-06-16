@@ -1,4 +1,5 @@
 import ClinicalTrials from "@/app/components/clinicalTrials";
+import ClinicalTrialsSearch from "@/app/components/clinicalTrialsSearch";
 
 export default async function Page({
   searchParams,
@@ -23,8 +24,9 @@ export default async function Page({
     .catch((e) => console.error("An error occured: " + e));
 
   return (
-    <div className="p-8 font-[family-name:var(--font-geist-sans)]">
-      <main>
+    <div className="font-[family-name:var(--font-geist-sans)]">
+      <ClinicalTrialsSearch />
+      <main className="p-8">
         <ClinicalTrials
           studies={data.studies}
           nextPageToken={data.nextPageToken}
