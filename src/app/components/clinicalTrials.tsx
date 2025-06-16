@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 export default function ClinicalTrials({ studies, nextPageToken, query}: Data) {
   const [trials, setTrials] = useState(studies);
@@ -64,7 +64,7 @@ export default function ClinicalTrials({ studies, nextPageToken, query}: Data) {
             <p className="text-lg">Conditions: {conditions.join(", ")}</p>
             <p>NCT Number: {nctId}</p>
             <div className="justify-self-center bottom">
-              <button className="btn" value={nctId}>Apply To Trial</button>
+              <a href={"/trial?nctId=" + nctId} target="_blank"><button className="btn">Apply To Trial</button></a>
             </div>
           </div>
         ),
