@@ -1,15 +1,19 @@
 "use client";
 
-import {redirect, useSearchParams } from "next/navigation";
+import { redirect, useSearchParams } from "next/navigation";
 import React, { useCallback, useEffect } from "react";
+
+type formStatus = "idle" | "submitting" | "success" | "fail";
 
 export default function ApplicationPage() {
   const searchParams = useSearchParams();
+  const [status, setStatus] = React.useState<formStatus>("idle");
+  const [isDisabled, setDisabled] = React.useState(false);
   const [applicationData, setApplicationData] = React.useState({
     firstName: "",
     lastName: "",
     email: "",
-    phone: "",
+    phoneNumber: "+",
     nctId: searchParams.get("nctId"),
   });
   const updateApplicationLetter = useCallback(() => {
@@ -18,24 +22,11 @@ export default function ApplicationPage() {
       `${applicationData.lastName || "[Last Name]"}, and I am writing to express my strong interest in ` +
       `participating in your upcoming clinical trial ${applicationData.nctId}.` +
       `\nYou can contact me by replying directly to this email or reaching me by phone ` +
-      `at ${applicationData.phone || "[Phone Number]"} or ${applicationData.email || "[Email Address]"} ` +
+      `at ${applicationData.phoneNumber.length > 1 ? applicationData.phoneNumber : "[phone Number]"} ` +
+      `or ${applicationData.email || "[Email Address]"} ` +
       `\nThank you for considering my interest!`
     );
-  }, [
-    applicationData.firstName,
-    applicationData.lastName,
-    applicationData.email,
-    applicationData.phone,
-    applicationData.nctId,
-  ]);
-
-  fetch(
-    `https://clinicaltrials.gov/api/v2/studies/${applicationData.nctId}`,
-  ).then((response) => {
-    if (!response.ok) {
-      redirect(`/notFound`);
-    }
-  });
+  }, [applicationData]);
 
   const [applicationLetter, setApplicationLetter] = React.useState(
     updateApplicationLetter(),
@@ -47,37 +38,72 @@ export default function ApplicationPage() {
       firstName: e.target.value,
     });
   };
-
   const handleLastName = (e: React.ChangeEvent<HTMLInputElement>) => {
     setApplicationData({
       ...applicationData,
       lastName: e.target.value,
     });
   };
-
   const handleEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
     setApplicationData({
       ...applicationData,
       email: e.target.value,
     });
   };
+  const handlePhoneNumber = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (/^\+?\d*$/.test(e.target.value)) {
+      if (e.target.value[0] !== "+") return;
 
-  const handlePhone = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setApplicationData({
-      ...applicationData,
-      phone: e.target.value,
-    });
+      if (e.target.value.length <= 13)
+        setApplicationData({
+          ...applicationData,
+          phoneNumber: e.target.value,
+        });
+    }
   };
-
   useEffect(() => {
     setApplicationLetter(updateApplicationLetter());
   }, [updateApplicationLetter]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    return e;
+    setDisabled(true);
+    setStatus("submitting");
+    await fetch("/api/trial/application/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        applicationData,
+        applicationLetter,
+      }),
+    })
+      .then(() => setStatus("success"))
+      .catch((e) => {
+        console.error(e);
+        setStatus("fail");
+      });
   };
+
+  const getButtonText = () => {
+    switch (status) {
+      case "submitting":
+        return "Submitting...";
+      case "success":
+        return "Application Submitted!";
+      case "fail":
+        return "Application Failed!";
+      default:
+        return "Submit";
+    }
+  };
+
+  fetch(
+    `https://clinicaltrials.gov/api/v2/studies/${applicationData.nctId}`,
+  ).then((response) => {
+    if (!response.ok) {
+      redirect(`/notFound`);
+    }
+  });
 
   return (
     <div className="font-[family-name:var(--font-geist-sans)]">
@@ -125,13 +151,11 @@ export default function ApplicationPage() {
               <input
                 className="input"
                 inputMode="numeric"
-                pattern="[0-9]*"
-                name="phone"
-                placeholder="+"
-                value={applicationData.phone}
-                onChange={handlePhone}
-                minLength={10}
-                maxLength={13}
+                pattern="^\+[\d]{12}$"
+                name="phoneNumber"
+                placeholder=""
+                value={applicationData.phoneNumber}
+                onChange={handlePhoneNumber}
                 required
               />
             </div>
@@ -142,11 +166,29 @@ export default function ApplicationPage() {
             </label>
             <textarea className="letter" readOnly value={applicationLetter} />
             <label>
-              <input type="checkbox" name="agreementCheckBox" className="mr-1" required />
+              <input
+                type="checkbox"
+                name="agreementCheckBox"
+                className="mr-1"
+                required
+              />
               I agree to privacy policy and terms of use
             </label>
           </div>
-          <button className="btn w-full">Submit</button>
+          <button
+            className={`btn w-full ${
+              status === "submitting"
+                ? "btn-submitting"
+                : status === "success"
+                  ? "btn-success"
+                  : status === "fail"
+                    ? "btn-fail"
+                    : ""
+            }`}
+            disabled={isDisabled}
+          >
+            {getButtonText()}
+          </button>
         </form>
       </main>
     </div>
