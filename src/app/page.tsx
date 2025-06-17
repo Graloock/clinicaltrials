@@ -21,7 +21,7 @@ export default async function Page({
   const response = await fetch(url.toString(), { cache: "no-store" });
   const data = await response
     .json()
-    .catch((e) => console.error("An error occured: " + e));
+    .catch((e) => console.error("An error occurred: " + e));
 
   return (
     <div className="font-[family-name:var(--font-geist-sans)]">

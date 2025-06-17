@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: var(--color-blue-200);
+  --background: #ffffff;
   --foreground: #171717;
 }
 
@@ -24,21 +24,33 @@ body {
 }
 
 .btn {
-  @apply bg-blue-600 hover:bg-blue-800  active:bg-blue-950 text-white font-bold py-2 px-4 rounded-full duration-100;
+  @apply bg-blue-500 hover:bg-blue-600  active:bg-blue-800 text-white font-bold shadow-md py-2 px-4 rounded-full duration-100;
 }
 
 .card {
-  @apply bg-blue-500 border-2 text-white border-blue-600 py-2 px-4 rounded-2xl shadow-lg;
+  @apply bg-blue-200 border-2 border-blue-300 py-2 px-4 rounded-2xl shadow-lg;
+}
+
+.centered {
+  @apply flex items-center justify-center min-h-screen;
 }
 
 .header {
-  @apply w-full bg-blue-600 text-white py-3 px-8 text-xl font-semibold shadow-md;
+  @apply w-full bg-blue-500 text-white py-3 px-8 text-xl font-semibold shadow-md;
+}
+
+.letter {
+  @apply w-full h-52 resize-none bg-blue-100 rounded-md p-2 text-justify;
 }
 
 .search-btn {
-  @apply absolute right-1 top-1/2 -translate-y-1/2 size-6 text-sm bg-blue-600 rounded-2xl hover:bg-blue-800 active:bg-blue-950 duration-100;
+  @apply absolute right-1 top-1/2 -translate-y-1/2 size-6 text-sm bg-blue-500 rounded-2xl hover:bg-blue-800 active:bg-blue-950 duration-100;
 }
 
 .input {
-  @apply bg-white rounded-md shadow-md pl-2 pr-2 w-full ;
+  @apply bg-white rounded-md shadow-md pl-2 pr-2 w-full;
+}
+
+.form-application {
+  @apply bg-blue-200 border-2 border-blue-300 rounded-2xl shadow-2xl p-4 w-full max-w-md;
 }

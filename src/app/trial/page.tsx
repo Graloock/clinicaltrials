@@ -1,8 +1,7 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import React from "react";
-import Input, { type Value } from "react-phone-number-input/input";
+import {redirect, useSearchParams } from "next/navigation";
+import React, { useCallback, useEffect } from "react";
 
 export default function ApplicationPage() {
   const searchParams = useSearchParams();
@@ -13,6 +12,34 @@ export default function ApplicationPage() {
     phone: "",
     nctId: searchParams.get("nctId"),
   });
+  const updateApplicationLetter = useCallback(() => {
+    return (
+      `I hope this message finds you well. My name is ${applicationData.firstName || "[First Name]"} ` +
+      `${applicationData.lastName || "[Last Name]"}, and I am writing to express my strong interest in ` +
+      `participating in your upcoming clinical trial ${applicationData.nctId}.` +
+      `\nYou can contact me by replying directly to this email or reaching me by phone ` +
+      `at ${applicationData.phone || "[Phone Number]"} or ${applicationData.email || "[Email Address]"} ` +
+      `\nThank you for considering my interest!`
+    );
+  }, [
+    applicationData.firstName,
+    applicationData.lastName,
+    applicationData.email,
+    applicationData.phone,
+    applicationData.nctId,
+  ]);
+
+  fetch(
+    `https://clinicaltrials.gov/api/v2/studies/${applicationData.nctId}`,
+  ).then((response) => {
+    if (!response.ok) {
+      redirect(`/notFound`);
+    }
+  });
+
+  const [applicationLetter, setApplicationLetter] = React.useState(
+    updateApplicationLetter(),
+  );
 
   const handleFirstName = (e: React.ChangeEvent<HTMLInputElement>) => {
     setApplicationData({
@@ -35,75 +62,93 @@ export default function ApplicationPage() {
     });
   };
 
-  const handlePhone = (e: Value) => {
+  const handlePhone = (e: React.ChangeEvent<HTMLInputElement>) => {
     setApplicationData({
       ...applicationData,
-      phone: e,
+      phone: e.target.value,
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {};
+  useEffect(() => {
+    setApplicationLetter(updateApplicationLetter());
+  }, [updateApplicationLetter]);
 
-    return (
-      <div>
-        <main className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
-          <form
-            onSubmit={handleSubmit}
-            className="bg-blue-200 rounded-2xl shadow-2xl p-4 w-full max-w-md"
-          >
-            <div className="grid md:grid-cols-2">
-              <div className="p-2">
-                <label className="block mb-1 font-medium">First Name</label>
-                <input
-                  className="input"
-                  type="text"
-                  name="firstName"
-                  placeholder="John"
-                  value={applicationData.firstName}
-                  onChange={handleFirstName}
-                  required
-                />
-              </div>
-              <div className="p-2">
-                <label className="block mb-1 font-medium">Last Name</label>
-                <input
-                  className="input"
-                  type="text"
-                  name="lastName"
-                  placeholder="Doe"
-                  value={applicationData.lastName}
-                  onChange={handleLastName}
-                  required
-                />
-              </div>
-              <div className="p-2">
-                <label className="block mb-1 font-medium">E-mail</label>
-                <input
-                  className="input"
-                  type="email"
-                  name="email"
-                  placeholder="johndoe@exapmle.com"
-                  value={applicationData.email}
-                  onChange={handleEmail}
-                  required
-                />
-              </div>
-              <div className="p-2">
-                <label className="block mb-1 font-medium">Phone Number</label>
-                <Input
-                  className="input"
-                  type="phone"
-                  name="phoneNumber"
-                  placeholder="+"
-                  value={applicationData.phone}
-                  onChange={handlePhone}
-                  required
-                />
-              </div>
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    return e;
+  };
+
+  return (
+    <div className="font-[family-name:var(--font-geist-sans)]">
+      <main className="centered">
+        <form onSubmit={handleSubmit} className="form-application">
+          <div className="grid md:grid-cols-2 ">
+            <div className="p-2">
+              <label className="block mb-1 font-medium">First Name</label>
+              <input
+                className="input"
+                type="text"
+                name="firstName"
+                placeholder="John"
+                value={applicationData.firstName}
+                onChange={handleFirstName}
+                required
+              />
             </div>
-            <button className="btn w-full">Submit</button>
-          </form>
-        </main>
-      </div>
-    );
+            <div className="p-2">
+              <label className="block mb-1 font-medium">Last Name</label>
+              <input
+                className="input"
+                type="text"
+                name="lastName"
+                placeholder="Doe"
+                value={applicationData.lastName}
+                onChange={handleLastName}
+                required
+              />
+            </div>
+            <div className="p-2">
+              <label className="block mb-1 font-medium">E-mail</label>
+              <input
+                className="input"
+                type="email"
+                name="email"
+                placeholder="johndoe@exapmle.com"
+                value={applicationData.email}
+                onChange={handleEmail}
+                required
+              />
+            </div>
+            <div className="p-2">
+              <label className="block mb-1 font-medium">Phone Number</label>
+              <input
+                className="input"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                name="phone"
+                placeholder="+"
+                value={applicationData.phone}
+                onChange={handlePhone}
+                minLength={10}
+                maxLength={13}
+                required
+              />
+            </div>
+          </div>
+          <div className="p-2">
+            <label className="block mb-1 font-medium">
+              The following letter will be sent:
+            </label>
+            <textarea className="letter" readOnly value={applicationLetter} />
+            <label>
+              <input type="checkbox" name="agreementCheckBox" className="mr-1" required />
+              I agree to privacy policy and terms of use
+            </label>
+          </div>
+          <button className="btn w-full">Submit</button>
+        </form>
+      </main>
+    </div>
+  );
 }
