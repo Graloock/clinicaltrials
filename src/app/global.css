@@ -27,6 +27,18 @@ body {
   @apply bg-blue-500 hover:bg-blue-600  active:bg-blue-800 text-white font-bold shadow-md py-2 px-4 rounded-full duration-100;
 }
 
+.btn-submitting {
+  @apply bg-blue-400 hover:bg-blue-400 active:bg-blue-400;
+}
+
+.btn-success {
+  @apply bg-green-500 hover:bg-green-500 active:bg-green-500;
+}
+
+.btn-fail {
+  @apply bg-red-500 hover:bg-red-500 active:bg-red-500;
+}
+
 .card {
   @apply bg-blue-200 border-2 border-blue-300 py-2 px-4 rounded-2xl shadow-lg;
 }
@@ -40,7 +52,7 @@ body {
 }
 
 .letter {
-  @apply w-full h-52 resize-none bg-blue-100 rounded-md p-2 text-justify;
+  @apply w-full h-52 resize-none bg-blue-100 rounded-md shadow-md p-2 text-justify;
 }
 
 .search-btn {
