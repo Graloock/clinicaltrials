@@ -66,19 +66,20 @@ export default function ApplicationPage() {
     const nctId =
       new URLSearchParams(window.location.search).get("nctId") || "";
 
-    if (applicationData.nctId !== nctId)
+    if (applicationData.nctId !== nctId) {
       setApplicationData({
         ...applicationData,
         nctId: nctId,
       });
 
-    fetch(
-      `https://clinicaltrials.gov/api/v2/studies/${nctId}`,
-    ).then((response) => {
-      if (!response.ok) {
-        redirect(`/notFound`);
-      }
-    });
+      fetch(`https://clinicaltrials.gov/api/v2/studies/${nctId}`).then(
+        (response) => {
+          if (!response.ok) {
+            redirect(`/notFound`);
+          }
+        },
+      );
+    }
   }, [applicationData, updateApplicationLetter]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -93,7 +94,13 @@ export default function ApplicationPage() {
         applicationLetter,
       }),
     })
-      .then(() => setStatus("success"))
+      .then((res) => {
+        if (!res.ok) {
+          console.error("Something's wrong: " + res.status)
+          setStatus("fail");
+        } else
+          setStatus("success");
+      })
       .catch((e) => {
         console.error(e);
         setStatus("fail");
