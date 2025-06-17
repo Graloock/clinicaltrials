@@ -4,9 +4,9 @@ import ClinicalTrialsSearch from "@/app/components/clinicalTrialsSearch";
 export default async function Page({
   searchParams,
 }: {
-  searchParams: { cond?: string };
+  searchParams: Promise<{ cond?: string }>;
 }) {
-  const query = searchParams.cond || '';
+  const query = (await searchParams).cond || '';
   const url = new URL("https://clinicaltrials.gov/api/v2/studies");
   url.searchParams.set(
     "fields",
