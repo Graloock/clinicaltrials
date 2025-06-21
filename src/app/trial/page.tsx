@@ -1,12 +1,11 @@
 "use client";
 
-import { redirect, useSearchParams } from "next/navigation";
+import { redirect } from "next/navigation";
 import React, { useCallback, useEffect } from "react";
 
 type formStatus = "idle" | "submitting" | "success" | "fail";
 
 export default function ApplicationPage() {
-  const searchParams = useSearchParams();
   const [status, setStatus] = React.useState<formStatus>("idle");
   const [isDisabled, setDisabled] = React.useState(false);
   const [applicationData, setApplicationData] = React.useState({
@@ -14,7 +13,7 @@ export default function ApplicationPage() {
     lastName: "",
     email: "",
     phoneNumber: "+",
-    nctId: searchParams.get("nctId"),
+    nctId: "",
   });
   const updateApplicationLetter = useCallback(() => {
     return (
@@ -63,7 +62,25 @@ export default function ApplicationPage() {
   };
   useEffect(() => {
     setApplicationLetter(updateApplicationLetter());
-  }, [updateApplicationLetter]);
+
+    const nctId =
+      new URLSearchParams(window.location.search).get("nctId") || "";
+
+    if (applicationData.nctId !== nctId) {
+      setApplicationData({
+        ...applicationData,
+        nctId: nctId,
+      });
+
+      fetch(`https://clinicaltrials.gov/api/v2/studies/${nctId}`).then(
+        (response) => {
+          if (!response.ok) {
+            redirect(`/notFound`);
+          }
+        },
+      );
+    }
+  }, [applicationData, updateApplicationLetter]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,7 +94,13 @@ export default function ApplicationPage() {
         applicationLetter,
       }),
     })
-      .then(() => setStatus("success"))
+      .then((res) => {
+        if (!res.ok) {
+          console.error("Something's wrong: " + res.status)
+          setStatus("fail");
+        } else
+          setStatus("success");
+      })
       .catch((e) => {
         console.error(e);
         setStatus("fail");
@@ -96,14 +119,6 @@ export default function ApplicationPage() {
         return "Submit";
     }
   };
-
-  fetch(
-    `https://clinicaltrials.gov/api/v2/studies/${applicationData.nctId}`,
-  ).then((response) => {
-    if (!response.ok) {
-      redirect(`/notFound`);
-    }
-  });
 
   return (
     <div className="font-[family-name:var(--font-geist-sans)]">

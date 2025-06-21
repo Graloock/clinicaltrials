@@ -10,7 +10,7 @@ export default function ClinicalTrialsSearch() {
 
     if (!query.trim()) return;
     window.location.href = `/?cond=${query}`;
-  }
+  };
 
   return (
     <header className="fixed header">
@@ -24,7 +24,9 @@ export default function ClinicalTrialsSearch() {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search conditions..."
           />
-          <button type="submit" className="search-btn">🔍</button>
+          <button type="submit" className="search-btn">
+            🔍
+          </button>
         </form>
       </div>
     </header>
